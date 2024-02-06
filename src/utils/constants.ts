@@ -27,18 +27,3 @@ export enum Status {
   PAUSED = "PAUSED",
   GAME_OVER = "GAME_OVER",
 }
-
-export interface IPlotData {
-  hasMine: boolean
-  neighboursWithMine: number
-  isRevealed: boolean
-  isFlagged: boolean
-}
-
-export interface defaultStore {
-  game: DifficultyLevel
-  markedBombs: number
-  boardData: Array<IPlotData[] | []>
-  mines: Array<number[]> | []
-  status: Status
-}

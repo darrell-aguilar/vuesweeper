@@ -28,8 +28,9 @@
 import Plot from "./Plot.vue"
 import { defineComponent } from "vue"
 import { useStore } from "../store/index"
-import { DifficultyLevel, IPlotData, Status } from "../types/constants"
-import { checkNeighbours, floodFill } from "../helpers/helpers"
+import { DifficultyLevel, Status } from "../utils/constants"
+import { IPlotData } from "../types/types"
+import { navigateNeighbours } from "../utils/helpers"
 
 export default defineComponent({
   name: "Board",
@@ -76,8 +77,7 @@ export default defineComponent({
     setupGame() {
       const matrix = this.createMatrix()
       const matrixWithBombs = this.plotBombs(matrix)
-      const matrixWithNeighbours = this.plotNeighbours(matrixWithBombs)
-      this.boardData = matrixWithNeighbours
+      this.boardData = matrixWithBombs
     },
     createMatrix() {
       let data: Array<Array<IPlotData>> = []
@@ -111,25 +111,10 @@ export default defineComponent({
       this.store.mines = minesLocation
       return matrix
     },
-    plotNeighbours(matrixWithBombs: Array<Array<IPlotData>>) {
-      for (let i = 0; i < this.store.gameConfig.width; i++) {
-        for (let j = 0; j < this.store.gameConfig.height; j++) {
-          if (matrixWithBombs[i][j].hasMine) continue
-          matrixWithBombs[i][j].neighboursWithMine = checkNeighbours(
-            i,
-            j,
-            this.store.gameConfig,
-            matrixWithBombs
-          )
-        }
-      }
-      return matrixWithBombs
-    },
     clickEventHandler(x: number, y: number) {
       if (this.store.status === Status.GAME_OVER) return
 
       let box = this.boardData[x][y]
-      box.isRevealed = true
 
       if (box.isFlagged) {
         this.store.updateMarkedBombs("ADD")
@@ -142,7 +127,7 @@ export default defineComponent({
         return
       }
 
-      if (!box.neighboursWithMine) floodFill(x, y, this.config, this.boardData)
+      navigateNeighbours(x, y, this.store.gameConfig, this.store.boardData)
     },
     flag(event: any, x: number, y: number) {
       if (

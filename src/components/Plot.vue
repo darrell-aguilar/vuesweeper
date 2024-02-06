@@ -30,7 +30,8 @@
 <script lang="ts">
 import { useStore } from "../store/index"
 import { defineComponent, PropType } from "vue"
-import { IPlotData, Status, Colors } from "../types/constants"
+import { Status, Colors } from "../utils/constants"
+import { IPlotData } from "../types/types"
 
 export default defineComponent({
   name: "Plot",

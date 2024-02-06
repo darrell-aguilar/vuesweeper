@@ -1,10 +1,6 @@
 import { defineStore } from "pinia"
-import {
-  DifficultyLevel,
-  DIFFICULTY,
-  Status,
-  defaultStore,
-} from "../types/constants"
+import { DifficultyLevel, DIFFICULTY, Status } from "../utils/constants"
+import { defaultStore } from "../types/types"
 
 export const useStore = defineStore("defaultStore", {
   state: (): defaultStore => ({

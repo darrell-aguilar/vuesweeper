@@ -1,7 +1,7 @@
 <script lang="ts">
 import { defineComponent } from "vue"
 import Board from "./components/Board.vue"
-import { disableContextMenu } from "./helpers/helpers"
+import { disableContextMenu } from "./utils/helpers"
 
 export default defineComponent({
   name: "App",
