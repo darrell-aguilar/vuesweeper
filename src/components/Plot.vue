@@ -53,9 +53,7 @@ export default defineComponent({
     },
     color() {
       if (!this.data.neighboursWithMine) return
-      return `text-${
-        Colors[this.data.neighboursWithMine as keyof typeof Colors]
-      }`
+      return Colors[this.data.neighboursWithMine as keyof typeof Colors]
     },
   },
   methods: {

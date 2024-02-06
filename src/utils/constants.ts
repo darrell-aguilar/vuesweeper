@@ -5,14 +5,14 @@ export const DIFFICULTY = {
 }
 
 export const Colors = {
-  1: "blue",
-  2: "green",
-  3: "red",
-  4: "dark-blue",
-  5: "brown",
-  6: "cyan",
-  7: "black",
-  8: "grey",
+  1: "text-blue",
+  2: "text-green",
+  3: "text-red",
+  4: "text-dark-blue",
+  5: "text-brown",
+  6: "text-cyan",
+  7: "text-black",
+  8: "text-grey",
 }
 
 export enum DifficultyLevel {
@@ -22,8 +22,14 @@ export enum DifficultyLevel {
 }
 
 export enum Status {
-  START = "START",
-  IN_PROGRESS = "IN_PROGRESS",
-  PAUSED = "PAUSED",
-  GAME_OVER = "GAME_OVER",
+  START,
+  IN_PROGRESS,
+  PAUSED,
+  GAME_OVER,
+}
+
+export enum Overlays {
+  DIFFICULTY,
+  PAUSE,
+  COLORPALETTE,
 }

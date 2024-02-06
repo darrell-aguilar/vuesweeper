@@ -1,10 +1,18 @@
 <template>
   <div class="board">
-    <VSelect
-      v-model="difficulty"
-      label="Select Difficulty"
-      :items="modes"
-    ></VSelect>
+    <div class="board-menu my-5">
+      <v-btn @click="overlayOptions(overlay.DIFFICULTY)">Difficulty</v-btn>
+      <DifficultySelector
+        v-if="overlaySetting.component === overlay.DIFFICULTY"
+        v-model="overlaySetting.show"
+        @update-difficulty="store.setDifficulty"
+      />
+      <v-btn @click="overlayOptions(overlay.COLORPALETTE)">Color Palette</v-btn>
+      <ColorPaletteSelector
+        v-if="overlaySetting.component === overlay.COLORPALETTE"
+        v-model="overlaySetting.show"
+      />
+    </div>
     <template v-if="boardData.length">
       <div class="board-flag">
         <v-icon icon="mdi-flag" color="red"></v-icon> {{ store.bombsLeft }}
@@ -28,17 +36,24 @@
 import Plot from "./Plot.vue"
 import { defineComponent } from "vue"
 import { useStore } from "../store/index"
-import { DifficultyLevel, Status } from "../utils/constants"
+import { DifficultyLevel, Status, Overlays } from "../utils/constants"
 import { IPlotData } from "../types/types"
 import { navigateNeighbours } from "../utils/helpers"
+import DifficultySelector from "./DifficultySelector.vue"
+import ColorPaletteSelector from "./ColorPaletteSelector.vue"
 
 export default defineComponent({
   name: "Board",
-  components: { Plot },
+  components: { Plot, DifficultySelector, ColorPaletteSelector },
   data() {
     return {
       modes: Object.keys(DifficultyLevel),
       store: useStore(),
+      overlaySetting: {
+        show: false,
+        component: Overlays.DIFFICULTY,
+      },
+      overlay: Overlays,
     }
   },
   computed: {
@@ -122,7 +137,10 @@ export default defineComponent({
       }
 
       if (box.hasMine) {
-        this.showMines()
+        this.store.boardData[x][y].isFlagged = false
+        this.store.boardData[x][y].isRevealed = true
+
+        this.showMines(x, y)
         this.store.updateGameStatus(Status.GAME_OVER)
         return
       }
@@ -143,13 +161,21 @@ export default defineComponent({
 
       this.boardData[x][y].isFlagged = !this.boardData[x][y].isFlagged
     },
-    showMines() {
-      this.store.mines.forEach(([x, y], i) => {
-        setTimeout(() => {
-          this.store.boardData[x][y].isFlagged = false
-          this.store.boardData[x][y].isRevealed = true
-        }, (i + 1) * 200)
-      })
+    showMines(x: number, y: number) {
+      this.store.mines
+        .filter(([idx, idy]) => x !== idx && y !== idy)
+        .forEach(([x, y], i) => {
+          setTimeout(() => {
+            this.store.boardData[x][y].isFlagged = false
+            this.store.boardData[x][y].isRevealed = true
+          }, (i + 1) * 200)
+        })
+    },
+    overlayOptions(overlayComponent: Overlays) {
+      this.overlaySetting = {
+        show: !this.overlaySetting.show,
+        component: overlayComponent,
+      }
     },
   },
 })
