@@ -10,7 +10,7 @@ export interface IPlotData {
 export interface defaultStore {
   game: DifficultyLevel
   markedBombs: number
-  boardData: Array<IPlotData[] | []>
+  boardData: Array<IPlotData[]>
   mines: Array<number[]> | []
   status: Status
 }

@@ -1,7 +1,7 @@
 export const DIFFICULTY = {
-  EASY: { height: 10, width: 8, bombs: 12 },
-  MEDIUM: { height: 12, width: 10, bombs: 14 },
-  HARD: { height: 14, width: 12, bombs: 20 },
+  EASY: { height: 10, width: 6, bombs: 14 },
+  MEDIUM: { height: 12, width: 8, bombs: 22 },
+  HARD: { height: 14, width: 10, bombs: 30 },
 }
 
 export const Colors = {

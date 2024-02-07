@@ -1,7 +1,5 @@
 <template>
-  <v-overlay v-model="value">
-    <div>This is the color palette selector</div>
-  </v-overlay>
+  <div>This is the color palette selector</div>
 </template>
 
 <script lang="ts">

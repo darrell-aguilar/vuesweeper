@@ -1,21 +1,11 @@
 <template>
-  <div class="board">
+  <div class="board" @keydown="pauseGame">
     <div class="board-menu my-5">
-      <v-btn @click="overlayOptions(overlay.DIFFICULTY)">Difficulty</v-btn>
-      <DifficultySelector
-        v-if="overlaySetting.component === overlay.DIFFICULTY"
-        v-model="overlaySetting.show"
-        @update-difficulty="store.setDifficulty"
-      />
-      <v-btn @click="overlayOptions(overlay.COLORPALETTE)">Color Palette</v-btn>
-      <ColorPaletteSelector
-        v-if="overlaySetting.component === overlay.COLORPALETTE"
-        v-model="overlaySetting.show"
-      />
+      <Settings v-model="showSettings" @click="showSettings = true" />
     </div>
     <template v-if="boardData.length">
       <div class="board-flag">
-        <v-icon icon="mdi-flag" color="red"></v-icon> {{ store.bombsLeft }}
+        <v-icon icon="mdi-flag" color="red"></v-icon> {{ store.flagsLeft }}
       </div>
       <div class="board-container">
         <div class="board-row" v-for="(xAxis, idx) in boardData" :key="idx">
@@ -24,7 +14,7 @@
             :key="idy"
             :data="yAxis"
             @click="clickEventHandler(idx, idy)"
-            @mark="flag($event, idx, idy)"
+            @mark="flag(idx, idy)"
           ></Plot>
         </div>
       </div>
@@ -36,35 +26,21 @@
 import Plot from "./Plot.vue"
 import { defineComponent } from "vue"
 import { useStore } from "../store/index"
-import { DifficultyLevel, Status, Overlays } from "../utils/constants"
+import { Status } from "../utils/constants"
 import { IPlotData } from "../types/types"
 import { navigateNeighbours } from "../utils/helpers"
-import DifficultySelector from "./DifficultySelector.vue"
-import ColorPaletteSelector from "./ColorPaletteSelector.vue"
+import Settings from "./Settings.vue"
 
 export default defineComponent({
   name: "Board",
-  components: { Plot, DifficultySelector, ColorPaletteSelector },
+  components: { Plot, Settings },
   data() {
     return {
-      modes: Object.keys(DifficultyLevel),
       store: useStore(),
-      overlaySetting: {
-        show: false,
-        component: Overlays.DIFFICULTY,
-      },
-      overlay: Overlays,
+      showSettings: false,
     }
   },
   computed: {
-    difficulty: {
-      set(value: any) {
-        this.store.setDifficulty(value)
-      },
-      get() {
-        return this.store.game
-      },
-    },
     boardData: {
       set(value: any) {
         this.store.setBoardData(value)
@@ -79,6 +55,12 @@ export default defineComponent({
     totalBoxes() {
       return this.config.height * this.config.width
     },
+    paused() {
+      return this.store.status === Status.PAUSED
+    },
+    difficulty() {
+      return this.store.game
+    },
   },
   watch: {
     config: {
@@ -86,6 +68,9 @@ export default defineComponent({
         this.setupGame()
       },
       immediate: true,
+    },
+    difficulty() {
+      this.setupGame()
     },
   },
   methods: {
@@ -127,19 +112,13 @@ export default defineComponent({
       return matrix
     },
     clickEventHandler(x: number, y: number) {
-      if (this.store.status === Status.GAME_OVER) return
+      if (this.store.status === Status.GAME_OVER || this.store.winner) return
 
       let box = this.boardData[x][y]
 
-      if (box.isFlagged) {
-        this.store.updateMarkedBombs("ADD")
-        box.isFlagged = false
-      }
+      box.isFlagged = false
 
       if (box.hasMine) {
-        this.store.boardData[x][y].isFlagged = false
-        this.store.boardData[x][y].isRevealed = true
-
         this.showMines(x, y)
         this.store.updateGameStatus(Status.GAME_OVER)
         return
@@ -147,35 +126,32 @@ export default defineComponent({
 
       navigateNeighbours(x, y, this.store.gameConfig, this.store.boardData)
     },
-    flag(event: any, x: number, y: number) {
+    flag(x: number, y: number) {
       if (
         this.store.status === Status.GAME_OVER ||
         this.boardData[x][y].isRevealed
       )
         return
 
-      if (!event && this.store.bombsLeft)
-        this.store.updateMarkedBombs("SUBTRACT")
-      else if (event && !this.store.bombsLeft)
-        this.store.updateMarkedBombs("ADD")
-
       this.boardData[x][y].isFlagged = !this.boardData[x][y].isFlagged
     },
     showMines(x: number, y: number) {
-      this.store.mines
-        .filter(([idx, idy]) => x !== idx && y !== idy)
-        .forEach(([x, y], i) => {
-          setTimeout(() => {
-            this.store.boardData[x][y].isFlagged = false
-            this.store.boardData[x][y].isRevealed = true
-          }, (i + 1) * 200)
-        })
+      this.store.boardData[x][y].isFlagged = false
+      this.store.boardData[x][y].isRevealed = true
+
+      this.store.mines.forEach(([x, y], i) => {
+        setTimeout(() => {
+          this.store.boardData[x][y].isFlagged = false
+          this.store.boardData[x][y].isRevealed = true
+        }, (i + 1) * 200)
+      })
     },
-    overlayOptions(overlayComponent: Overlays) {
-      this.overlaySetting = {
-        show: !this.overlaySetting.show,
-        component: overlayComponent,
-      }
+    pauseGame(e: KeyboardEvent) {
+      console.log(e)
+      if (this.store.status === Status.GAME_OVER) return
+      if (this.store.status === Status.PAUSED) {
+        this.store.updateGameStatus(Status.IN_PROGRESS)
+      } else this.store.updateGameStatus(Status.PAUSED)
     },
   },
 })
@@ -193,15 +169,23 @@ export default defineComponent({
   &-container {
     display: flex;
     flex-direction: row;
-    gap: 0.5rem;
+    gap: 0.125rem;
     justify-content: center;
+
+    @include sm {
+      gap: 0.5rem;
+    }
   }
 
   &-row {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.125rem;
     justify-content: center;
+
+    @include sm {
+      gap: 0.5rem;
+    }
   }
 }
 </style>

@@ -40,34 +40,6 @@ export const checkNeighbours = (
   return neighbours
 }
 
-export const floodFill = (
-  x: number,
-  y: number,
-  config: any,
-  matrix: Array<IPlotData[]>
-) => {
-  let height = config.height
-  let width = config.width
-  for (let i = -1; i <= 1; i++) {
-    for (let j = -1; j <= 1; j++) {
-      let xOffset = i + x
-      let yOffset = j + y
-      if (xOffset > -1 && xOffset < width && yOffset > -1 && yOffset < height) {
-        if (
-          !matrix[xOffset][yOffset].hasMine &&
-          !matrix[xOffset][yOffset].isRevealed &&
-          !matrix[xOffset][yOffset].isFlagged
-        ) {
-          matrix[xOffset][yOffset].isRevealed = true
-          if (!matrix[xOffset][yOffset].neighboursWithMine) {
-            floodFill(xOffset, yOffset, config, matrix)
-          }
-        }
-      }
-    }
-  }
-}
-
 //  navigates all neighbours recursively
 export const navigateNeighbours = (
   x: number,
@@ -79,6 +51,7 @@ export const navigateNeighbours = (
   const mines: number = countMines(neighbours, matrix)
 
   matrix[x][y].isRevealed = true
+  matrix[x][y].isFlagged = false
 
   if (mines > 0) {
     matrix[x][y].neighboursWithMine = mines

@@ -12,8 +12,27 @@ export const useStore = defineStore("defaultStore", {
   }),
   getters: {
     gameConfig: (state) => DIFFICULTY[state.game],
-    bombsLeft(state): number {
-      return this.gameConfig.bombs - state.markedBombs
+    flagsLeft(): number {
+      return (
+        this.gameConfig.bombs -
+        this.boardData.reduce((sum, arr) => {
+          return (
+            sum +
+            arr.reduce((innerSum, innerArr) => {
+              return innerArr.isFlagged ? innerSum + 1 : innerSum
+            }, 0)
+          )
+        }, 0)
+      )
+    },
+    winner: (state): boolean => {
+      return state.boardData.every((arr) =>
+        arr.every(
+          (innerArr) =>
+            (innerArr.hasMine && !innerArr.isRevealed) ||
+            (!innerArr.hasMine && innerArr.isRevealed)
+        )
+      )
     },
   },
   actions: {
@@ -25,9 +44,6 @@ export const useStore = defineStore("defaultStore", {
     },
     updateGameStatus(value: any) {
       this.status = value
-    },
-    updateMarkedBombs(method: any) {
-      method === "ADD" ? this.markedBombs-- : this.markedBombs++
     },
     setMines(value: any) {
       this.mines = value

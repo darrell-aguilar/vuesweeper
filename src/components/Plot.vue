@@ -6,18 +6,18 @@
     @contextmenu="$emit('mark', data.isFlagged)"
   >
     <v-icon
-      class="mt-2"
-      v-if="data.isFlagged"
+      class="plot-icon"
+      v-if="data.isFlagged && !data.isRevealed"
       color="red"
       icon="mdi-flag"
     ></v-icon>
     <v-icon
-      class="mt-2"
+      class="plot-icon"
       v-if="data.hasMine && !data.isFlagged && data.isRevealed"
       icon="mdi-bomb"
     ></v-icon>
     <p
-      class="mt-2 plot-neighbour"
+      class="plot-neighbour"
       :class="color"
       v-if="data.neighboursWithMine && data.isRevealed"
     >
@@ -69,13 +69,18 @@ export default defineComponent({
 <style scoped lang="scss">
 .plot {
   &-container {
-    width: 3rem;
-    height: 3rem;
+    width: 2rem;
+    height: 2rem;
     border: rgb(23, 23, 23) solid 2px;
     border-radius: 0.5rem;
     background-color: #d3d3d3;
     cursor: pointer;
     text-align: center;
+
+    @include sm {
+      width: 2.5rem;
+      height: 2.5rem;
+    }
 
     &:hover {
       background-color: #efefef;
@@ -92,11 +97,22 @@ export default defineComponent({
 
   &-icon {
     vertical-align: bottom;
+    margin-top: 0.125rem;
+
+    @include sm {
+      margin-top: 0.25rem;
+    }
   }
 
   &-neighbour {
-    font-size: 1.25rem;
+    font-size: 1rem;
     font-weight: 800;
+    margin-top: 0.125rem;
+
+    @include sm {
+      font-size: 1.5rem;
+      margin-top: 0.125rem;
+    }
   }
 }
 </style>
