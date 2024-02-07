@@ -1,7 +1,7 @@
 <template>
-  <div class="board" @keydown="pauseGame">
+  <div class="board">
     <div class="board-menu my-5">
-      <Settings v-model="showSettings" @click="showSettings = true" />
+      <Settings v-model="showSettings" @click="showSettingsModal" />
     </div>
     <template v-if="boardData.length">
       <div class="board-flag">
@@ -58,6 +58,9 @@ export default defineComponent({
     paused() {
       return this.store.status === Status.PAUSED
     },
+    gameOver() {
+      return this.store.status === Status.GAME_OVER
+    },
     difficulty() {
       return this.store.game
     },
@@ -112,7 +115,7 @@ export default defineComponent({
       return matrix
     },
     clickEventHandler(x: number, y: number) {
-      if (this.store.status === Status.GAME_OVER || this.store.winner) return
+      if (this.gameOver || this.store.winner) return
 
       let box = this.boardData[x][y]
 
@@ -127,11 +130,7 @@ export default defineComponent({
       navigateNeighbours(x, y, this.store.gameConfig, this.store.boardData)
     },
     flag(x: number, y: number) {
-      if (
-        this.store.status === Status.GAME_OVER ||
-        this.boardData[x][y].isRevealed
-      )
-        return
+      if (this.gameOver || this.boardData[x][y].isRevealed) return
 
       this.boardData[x][y].isFlagged = !this.boardData[x][y].isFlagged
     },
@@ -139,19 +138,16 @@ export default defineComponent({
       this.store.boardData[x][y].isFlagged = false
       this.store.boardData[x][y].isRevealed = true
 
-      this.store.mines.forEach(([x, y], i) => {
+      this.store.mines.forEach(([row, col], i) => {
         setTimeout(() => {
-          this.store.boardData[x][y].isFlagged = false
-          this.store.boardData[x][y].isRevealed = true
+          this.store.boardData[row][col].isFlagged = false
+          this.store.boardData[row][col].isRevealed = true
         }, (i + 1) * 200)
       })
     },
-    pauseGame(e: KeyboardEvent) {
-      console.log(e)
-      if (this.store.status === Status.GAME_OVER) return
-      if (this.store.status === Status.PAUSED) {
-        this.store.updateGameStatus(Status.IN_PROGRESS)
-      } else this.store.updateGameStatus(Status.PAUSED)
+    showSettingsModal() {
+      if (this.gameOver) return
+      this.showSettings = true
     },
   },
 })

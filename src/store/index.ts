@@ -8,7 +8,7 @@ export const useStore = defineStore("defaultStore", {
     markedBombs: 0,
     boardData: [],
     mines: [],
-    status: Status.START,
+    status: Status.MENU,
   }),
   getters: {
     gameConfig: (state) => DIFFICULTY[state.game],
