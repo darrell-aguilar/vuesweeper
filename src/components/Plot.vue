@@ -11,11 +11,13 @@
       color="red"
       icon="mdi-flag"
     ></v-icon>
-    <v-icon
-      class="plot-icon"
-      v-if="data.hasMine && !data.isFlagged && data.isRevealed"
-      icon="mdi-bomb"
-    ></v-icon>
+    <Transition name="bomb">
+      <v-icon
+        class="plot-icon"
+        v-if="data.hasMine && !data.isFlagged && data.isRevealed"
+        icon="mdi-bomb"
+      ></v-icon>
+    </Transition>
     <p
       class="plot-neighbour"
       :class="color"
@@ -113,6 +115,24 @@ export default defineComponent({
       font-size: 1.5rem;
       margin-top: 0.125rem;
     }
+  }
+}
+
+.bomb-enter-active {
+  animation: bomb-scale 1s ease-out;
+}
+
+@keyframes bomb-scale {
+  0% {
+    transform: scale(0.5);
+  }
+
+  70% {
+    transform: scale(1.2);
+  }
+
+  100% {
+    transform: scale(1);
   }
 }
 </style>
