@@ -1,6 +1,10 @@
 <template>
-  <Menu v-if="showMenu" />
-  <Board v-else />
+  <v-theme-provider :theme="currentTheme">
+    <v-app>
+      <Menu v-if="showMenu" />
+      <Board v-else />
+    </v-app>
+  </v-theme-provider>
 </template>
 
 <script lang="ts">
@@ -25,6 +29,9 @@ export default defineComponent({
   computed: {
     showMenu() {
       return this.store.status === Status.MENU
+    },
+    currentTheme() {
+      return this.store.theme
     },
   },
 })

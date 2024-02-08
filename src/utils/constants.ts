@@ -28,8 +28,8 @@ export enum Status {
   GAME_OVER,
 }
 
-export enum Overlays {
-  DIFFICULTY,
+export enum TimerStatus {
+  START,
   PAUSE,
-  COLORPALETTE,
+  RESUME,
 }

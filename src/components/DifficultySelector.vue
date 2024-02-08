@@ -48,10 +48,10 @@ export default defineComponent({
 
 <style scoped lang="scss">
 .difficulty {
-  margin: 2rem 4rem;
+  padding: 2rem 4rem;
 
   @include sm {
-    margin: 2rem;
+    padding: 2rem;
   }
 
   &-title {

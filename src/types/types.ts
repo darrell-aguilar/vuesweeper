@@ -13,4 +13,5 @@ export interface defaultStore {
   boardData: Array<IPlotData[]>
   mines: Array<number[]> | []
   status: Status
+  theme: string
 }

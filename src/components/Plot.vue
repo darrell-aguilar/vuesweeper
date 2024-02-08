@@ -34,6 +34,7 @@ import { useStore } from "../store/index"
 import { defineComponent, PropType } from "vue"
 import { Status, Colors } from "../utils/constants"
 import { IPlotData } from "../types/types"
+import bombAudio from "../assets/bomb-explode.wav"
 
 export default defineComponent({
   name: "Plot",
@@ -41,6 +42,7 @@ export default defineComponent({
   data() {
     return {
       store: useStore(),
+      audioFile: new Audio(bombAudio),
     }
   },
   props: {
@@ -56,6 +58,16 @@ export default defineComponent({
     color() {
       if (!this.data.neighboursWithMine) return
       return Colors[this.data.neighboursWithMine as keyof typeof Colors]
+    },
+  },
+  watch: {
+    data: {
+      handler(newData) {
+        if (newData.isRevealed && newData.hasMine) {
+          this.audioFile.play()
+        }
+      },
+      deep: true,
     },
   },
   methods: {

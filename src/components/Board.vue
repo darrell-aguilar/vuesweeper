@@ -3,7 +3,7 @@
     <div class="board-menu my-5">
       <Settings v-model="showSettings" @click="showSettingsModal" />
     </div>
-    <Timer />
+    <Timer :timer-status="timerState" />
     <template v-if="boardData.length">
       <div class="board-flag">
         <v-icon icon="mdi-flag" color="red"></v-icon> {{ store.flagsLeft }}
@@ -27,7 +27,7 @@
 import Plot from "./Plot.vue"
 import { defineComponent } from "vue"
 import { useStore } from "../store/index"
-import { Status } from "../utils/constants"
+import { Status, TimerStatus } from "../utils/constants"
 import { IPlotData } from "../types/types"
 import { navigateNeighbours } from "../utils/helpers"
 import Settings from "./Settings.vue"
@@ -40,6 +40,7 @@ export default defineComponent({
     return {
       store: useStore(),
       showSettings: false,
+      timerState: TimerStatus.START,
     }
   },
   computed: {
@@ -76,6 +77,13 @@ export default defineComponent({
     },
     difficulty() {
       this.setupGame()
+    },
+    gameOver: {
+      handler(lost) {
+        if (lost) {
+          this.timerState = TimerStatus.PAUSE
+        }
+      },
     },
   },
   methods: {

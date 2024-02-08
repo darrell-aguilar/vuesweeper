@@ -4,9 +4,15 @@
 
 <script lang="ts">
 import { defineComponent } from "vue"
+import { TimerStatus } from "../utils/constants"
 
 export default defineComponent({
   name: "Timer",
+  props: {
+    timerStatus: {
+      default: TimerStatus.START,
+    },
+  },
   data() {
     return {
       time: 0,
@@ -28,20 +34,23 @@ export default defineComponent({
       return `${minutesString}:${secondsString}`
     },
   },
-  mounted() {
-    this.runTimer()
-  },
-  methods: {
-    runTimer() {
-      this.time = 0
-      this.timer = setInterval(() => this.time++, 1000)
-    },
-    clearTimer() {
-      clearInterval(this.timer)
-    },
-    restartTimer() {
-      this.clearTimer()
-      this.runTimer()
+  watch: {
+    timerStatus: {
+      handler(newVal) {
+        switch (newVal) {
+          case TimerStatus.START:
+            clearInterval(this.timer)
+            this.time = 0
+            this.timer = setInterval(() => this.time++, 1000)
+            break
+          case TimerStatus.PAUSE:
+            clearInterval(this.timer)
+            break
+          case TimerStatus.RESUME:
+            this.timer = setInterval(() => this.time++, 1000)
+        }
+      },
+      immediate: true,
     },
   },
 })
