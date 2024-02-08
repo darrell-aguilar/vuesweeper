@@ -3,6 +3,7 @@
     <div class="board-menu my-5">
       <Settings v-model="showSettings" @click="showSettingsModal" />
     </div>
+    <Timer />
     <template v-if="boardData.length">
       <div class="board-flag">
         <v-icon icon="mdi-flag" color="red"></v-icon> {{ store.flagsLeft }}
@@ -30,10 +31,11 @@ import { Status } from "../utils/constants"
 import { IPlotData } from "../types/types"
 import { navigateNeighbours } from "../utils/helpers"
 import Settings from "./Settings.vue"
+import Timer from "./Timer.vue"
 
 export default defineComponent({
   name: "Board",
-  components: { Plot, Settings },
+  components: { Plot, Settings, Timer },
   data() {
     return {
       store: useStore(),
