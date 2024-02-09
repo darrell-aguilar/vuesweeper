@@ -15,7 +15,8 @@
       <v-icon
         class="plot-icon"
         v-if="data.hasMine && !data.isFlagged && data.isRevealed"
-        icon="mdi-bomb"
+        :color="bombColor"
+        :icon="bomb"
       ></v-icon>
     </Transition>
     <p
@@ -43,6 +44,7 @@ export default defineComponent({
     return {
       store: useStore(),
       audioFile: new Audio(bombAudio),
+      bomb: "mdi-bomb",
     }
   },
   props: {
@@ -59,12 +61,18 @@ export default defineComponent({
       if (!this.data.neighboursWithMine) return
       return Colors[this.data.neighboursWithMine as keyof typeof Colors]
     },
+    bombColor() {
+      return this.$vuetify.theme.current.colors.error
+    },
   },
   watch: {
     data: {
       handler(newData) {
         if (newData.isRevealed && newData.hasMine) {
-          this.audioFile.play()
+          setTimeout(() => {
+            this.audioFile.play()
+            this.bomb = "mdi-bomb-off"
+          }, 300)
         }
       },
       deep: true,
@@ -87,7 +95,7 @@ export default defineComponent({
     height: 2rem;
     border: rgb(23, 23, 23) solid 2px;
     border-radius: 0.5rem;
-    background-color: #d3d3d3;
+    background-color: rgb(var(--v-theme-surface-variant));
     cursor: pointer;
     text-align: center;
 
@@ -97,15 +105,15 @@ export default defineComponent({
     }
 
     &:hover {
-      background-color: #efefef;
+      background-color: rgb(var(--v-theme-surface-light));
     }
   }
 
   &-revealed {
-    background-color: #ffffff;
+    background-color: rgb(var(--v-theme-on-background));
 
     &:hover {
-      background-color: #ffffff;
+      background-color: rgb(var(--v-theme-on-background));
     }
   }
 
@@ -139,12 +147,12 @@ export default defineComponent({
     transform: scale(0.5);
   }
 
-  70% {
-    transform: scale(1.2);
+  30% {
+    transform: scale(0.9);
   }
 
   100% {
-    transform: scale(1);
+    transform: scale(1.2);
   }
 }
 </style>

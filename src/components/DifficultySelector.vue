@@ -1,8 +1,8 @@
 <template>
   <div class="difficulty">
-    <h3 class="difficulty-title">DIFFICULTY</h3>
+    <h2 class="difficulty-title">DIFFICULTY</h2>
     <h3 class="difficulty-header">Select a difficulty</h3>
-    <v-radio-group v-model="selectDifficulty" class="justify-center">
+    <v-radio-group v-model="selectDifficulty">
       <v-radio
         class="difficulty-selection"
         v-for="(difficulty, value, idx) in Difficulty"
@@ -13,7 +13,7 @@
       ></v-radio>
     </v-radio-group>
     <div class="difficulty-buttons">
-      <v-btn class="px-4" color="blue" @click="updateDifficulty">Save</v-btn>
+      <v-btn class="px-4" color="primary" @click="updateDifficulty">Save</v-btn>
     </div>
   </div>
 </template>
@@ -52,10 +52,6 @@ export default defineComponent({
 
   @include sm {
     padding: 2rem;
-  }
-
-  &-title {
-    margin: 1rem 0;
   }
 
   &-header {

@@ -1,8 +1,10 @@
 <template>
-  <v-btn prepend-icon="mdi-cog" @click="$emit('click')">Settings</v-btn>
+  <v-btn color="primary" prepend-icon="mdi-cog" @click="$emit('click')"
+    >Settings</v-btn
+  >
   <v-overlay v-model="value" class="justify-center align-center" persistent>
     <v-card class="settings-card">
-      <v-toolbar>
+      <v-toolbar color="primary">
         <v-toolbar-title>Settings</v-toolbar-title>
         <v-spacer></v-spacer>
         <v-btn icon="mdi-close" @click="closeModal"></v-btn>
