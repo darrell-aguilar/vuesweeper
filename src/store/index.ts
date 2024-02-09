@@ -35,6 +35,11 @@ export const useStore = defineStore("defaultStore", {
         )
       )
     },
+    loser: (state): boolean => {
+      return state.boardData.some((arr) =>
+        arr.some((innerArr) => innerArr.hasMine && innerArr.isRevealed)
+      )
+    },
   },
   actions: {
     setDifficulty(value: any) {

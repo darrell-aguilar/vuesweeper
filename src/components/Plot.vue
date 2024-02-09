@@ -33,7 +33,7 @@
 <script lang="ts">
 import { useStore } from "../store/index"
 import { defineComponent, PropType } from "vue"
-import { Status, Colors } from "../utils/constants"
+import { Colors } from "../utils/constants"
 import { IPlotData } from "../types/types"
 import bombAudio from "../assets/bomb-explode.wav"
 
@@ -54,15 +54,15 @@ export default defineComponent({
     },
   },
   computed: {
-    gameOver() {
-      return this.store.status === Status.GAME_OVER
-    },
     color() {
       if (!this.data.neighboursWithMine) return
       return Colors[this.data.neighboursWithMine as keyof typeof Colors]
     },
     bombColor() {
       return this.$vuetify.theme.current.colors.error
+    },
+    lost() {
+      return this.store.loser
     },
   },
   watch: {
@@ -80,7 +80,7 @@ export default defineComponent({
   },
   methods: {
     clickPlot() {
-      if (this.store.status !== Status.GAME_OVER) {
+      if (!this.lost) {
         this.$emit("clicked")
       }
     },

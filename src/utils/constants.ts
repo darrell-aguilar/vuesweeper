@@ -24,8 +24,6 @@ export enum DifficultyLevel {
 export enum Status {
   MENU,
   START,
-  PAUSED,
-  GAME_OVER,
 }
 
 export enum TimerStatus {

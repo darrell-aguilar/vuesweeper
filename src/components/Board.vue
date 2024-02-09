@@ -4,6 +4,7 @@
       <Settings v-model="showSettings" @click="showSettingsModal" />
     </div>
     <Timer :timer-status="timerState" />
+    <Result v-model="showResult" @restart="restart" />
     <template v-if="boardData.length">
       <div class="board-flag">
         <v-icon icon="mdi-flag" color="red"></v-icon> {{ store.flagsLeft }}
@@ -27,19 +28,21 @@
 import Plot from "./Plot.vue"
 import { defineComponent } from "vue"
 import { useStore } from "../store/index"
-import { Status, TimerStatus } from "../utils/constants"
+import { TimerStatus } from "../utils/constants"
 import { IPlotData } from "../types/types"
 import { navigateNeighbours } from "../utils/helpers"
 import Settings from "./Settings.vue"
 import Timer from "./Timer.vue"
+import Result from "./Result.vue"
 
 export default defineComponent({
   name: "Board",
-  components: { Plot, Settings, Timer },
+  components: { Plot, Settings, Timer, Result },
   data() {
     return {
       store: useStore(),
       showSettings: false,
+      showResult: false,
       timerState: TimerStatus.START,
     }
   },
@@ -58,11 +61,11 @@ export default defineComponent({
     totalBoxes() {
       return this.config.height * this.config.width
     },
-    paused() {
-      return this.store.status === Status.PAUSED
+    lost() {
+      return this.store.loser
     },
-    gameOver() {
-      return this.store.status === Status.GAME_OVER
+    won() {
+      return this.store.winner
     },
     difficulty() {
       return this.store.game
@@ -78,10 +81,11 @@ export default defineComponent({
     difficulty() {
       this.setupGame()
     },
-    gameOver: {
+    lost: {
       handler(lost) {
         if (lost) {
           this.timerState = TimerStatus.PAUSE
+          this.showResult = true
         }
       },
     },
@@ -125,7 +129,7 @@ export default defineComponent({
       return matrix
     },
     clickEventHandler(x: number, y: number) {
-      if (this.gameOver || this.store.winner) return
+      if (this.lost || this.store.winner) return
 
       let box = this.boardData[x][y]
 
@@ -133,14 +137,13 @@ export default defineComponent({
 
       if (box.hasMine) {
         this.showMines(x, y)
-        this.store.updateGameStatus(Status.GAME_OVER)
         return
       }
 
       navigateNeighbours(x, y, this.store.gameConfig, this.store.boardData)
     },
     flag(x: number, y: number) {
-      if (this.gameOver || this.boardData[x][y].isRevealed) return
+      if (this.lost || this.boardData[x][y].isRevealed) return
 
       this.boardData[x][y].isFlagged = !this.boardData[x][y].isFlagged
     },
@@ -156,8 +159,12 @@ export default defineComponent({
       })
     },
     showSettingsModal() {
-      if (this.gameOver) return
+      if (this.lost) return
       this.showSettings = true
+    },
+    restart() {
+      this.setupGame()
+      this.showResult = false
     },
   },
 })

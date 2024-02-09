@@ -3,7 +3,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue"
+import { defineComponent, PropType } from "vue"
 import { TimerStatus } from "../utils/constants"
 
 export default defineComponent({
@@ -11,6 +11,7 @@ export default defineComponent({
   props: {
     timerStatus: {
       default: TimerStatus.START,
+      type: Number as PropType<TimerStatus>,
     },
   },
   data() {
