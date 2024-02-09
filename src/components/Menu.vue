@@ -92,20 +92,6 @@ export default defineComponent({
 }
 
 .bomb-enter-active {
-  animation: bomb-scale 1s ease-out;
-}
-
-@keyframes bomb-scale {
-  0% {
-    transform: scale(0.5);
-  }
-
-  30% {
-    transform: scale(0.9);
-  }
-
-  100% {
-    transform: scale(1.2);
-  }
+  animation: bomb-animation 1s ease-out;
 }
 </style>
