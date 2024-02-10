@@ -108,3 +108,21 @@ const countMines = (
   }
   return minesCount
 }
+
+export const themeNameFormatter = (themeName: string) => {
+  if (!themeName.length) return ""
+  let formattedThemeName = ""
+  themeName.split("").forEach((char, id) => {
+    if (id === 0) {
+      formattedThemeName += char.toUpperCase()
+      return
+    }
+
+    if (char === char.toLowerCase()) {
+      formattedThemeName += char
+    } else {
+      formattedThemeName = formattedThemeName.concat(" ", char)
+    }
+  })
+  return formattedThemeName
+}

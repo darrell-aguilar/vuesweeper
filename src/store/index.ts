@@ -26,6 +26,21 @@ export const useStore = defineStore("defaultStore", {
         }, 0)
       )
     },
+    allBombsVisible(): boolean {
+      return (
+        this.gameConfig.bombs ===
+        this.boardData.reduce((sum, arr) => {
+          return (
+            sum +
+            arr.reduce((innerSum, innerArr) => {
+              return innerArr.hasMine && innerArr.isRevealed
+                ? innerSum + 1
+                : innerSum
+            }, 0)
+          )
+        }, 0)
+      )
+    },
     winner: (state): boolean => {
       return state.boardData.every((arr) =>
         arr.every(

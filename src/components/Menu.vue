@@ -6,7 +6,6 @@
         v-bind="bombConfig"
         v-if="bombConfig.showBomb"
         class="menu-bomb"
-        :color="bombColor"
       ></v-icon>
     </Transition>
     <v-btn @click="startGame" color="primary">Start Game</v-btn>
@@ -37,11 +36,6 @@ export default defineComponent({
   },
   mounted() {
     this.animateBomb()
-  },
-  computed: {
-    bombColor() {
-      return this.$vuetify.theme.current.colors.error
-    },
   },
   methods: {
     startGame() {

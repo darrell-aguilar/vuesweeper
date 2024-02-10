@@ -1,7 +1,11 @@
 <template>
   <div class="color-palette">
     <v-radio-group v-model="color">
-      <v-radio v-for="theme in themes" :value="theme" :label="theme"></v-radio>
+      <v-radio
+        v-for="theme in themes"
+        :value="theme"
+        :label="formatTheme(theme)"
+      ></v-radio>
     </v-radio-group>
   </div>
 </template>
@@ -9,9 +13,10 @@
 <script lang="ts">
 import { defineComponent } from "vue"
 import { useStore } from "../store"
+import { themeNameFormatter } from "../utils/helpers"
 
 export default defineComponent({
-  name: "ColorPaletteSelector",
+  name: "ThemeSelector",
   props: {
     modelValue: {
       default: false,
@@ -42,6 +47,11 @@ export default defineComponent({
     },
     themes() {
       return Object.keys(this.$vuetify.theme.themes)
+    },
+  },
+  methods: {
+    formatTheme(theme: string) {
+      return themeNameFormatter(theme)
     },
   },
   emits: ["update:modelValue"],

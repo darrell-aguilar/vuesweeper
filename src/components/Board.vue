@@ -3,6 +3,7 @@
     <div class="board-menu my-5">
       <Settings v-model="showSettings" @click="showSettingsModal" />
     </div>
+    <!-- <Confetti /> -->
     <Timer :timer-status="timerState" />
     <Result v-model="showResult" @restart="restart" />
     <template v-if="boardData.length">
@@ -34,10 +35,11 @@ import { navigateNeighbours } from "../utils/helpers"
 import Settings from "./Settings.vue"
 import Timer from "./Timer.vue"
 import Result from "./Result.vue"
+import Confetti from "./Confetti.vue"
 
 export default defineComponent({
   name: "Board",
-  components: { Plot, Settings, Timer, Result },
+  components: { Plot, Settings, Timer, Result, Confetti },
   data() {
     return {
       store: useStore(),
@@ -70,6 +72,9 @@ export default defineComponent({
     difficulty() {
       return this.store.game
     },
+    allBombsVisible() {
+      return this.store.allBombsVisible
+    },
   },
   watch: {
     config: {
@@ -85,6 +90,12 @@ export default defineComponent({
       handler(lost) {
         if (lost) {
           this.timerState = TimerStatus.PAUSE
+        }
+      },
+    },
+    allBombsVisible: {
+      handler(visible) {
+        if (visible) {
           this.showResult = true
         }
       },

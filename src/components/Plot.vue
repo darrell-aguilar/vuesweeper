@@ -4,6 +4,7 @@
     :class="{ 'plot-revealed': data.isRevealed }"
     @click="clickPlot"
     @contextmenu="$emit('mark', data.isFlagged)"
+    :style="bombStyle"
   >
     <v-icon
       class="plot-icon"
@@ -15,8 +16,8 @@
       <v-icon
         class="plot-icon"
         v-if="data.hasMine && !data.isFlagged && data.isRevealed"
-        :color="bombColor"
         :icon="bomb"
+        color="black"
       ></v-icon>
     </Transition>
     <p
@@ -45,6 +46,7 @@ export default defineComponent({
       store: useStore(),
       audioFile: new Audio(bombAudio),
       bomb: "mdi-bomb",
+      bombStyle: {},
     }
   },
   props: {
@@ -58,9 +60,6 @@ export default defineComponent({
       if (!this.data.neighboursWithMine) return
       return Colors[this.data.neighboursWithMine as keyof typeof Colors]
     },
-    bombColor() {
-      return this.$vuetify.theme.current.colors.error
-    },
     lost() {
       return this.store.loser
     },
@@ -72,10 +71,14 @@ export default defineComponent({
           setTimeout(() => {
             this.audioFile.play()
             this.bomb = "mdi-bomb-off"
+            this.bombStyle = {
+              backgroundColor: "red",
+            }
           }, 600)
-        }
+        } else this.bombStyle = {}
       },
       deep: true,
+      immediate: true,
     },
   },
   methods: {
@@ -110,11 +113,7 @@ export default defineComponent({
   }
 
   &-revealed {
-    background-color: rgb(var(--v-theme-on-background));
-
-    &:hover {
-      background-color: rgb(var(--v-theme-on-background));
-    }
+    background-color: white;
   }
 
   &-icon {

@@ -15,7 +15,7 @@
             <p>Difficulty</p>
           </v-tab>
           <v-tab value="color">
-            <p>Color Palette</p>
+            <p>Theme</p>
           </v-tab>
         </v-tabs>
         <v-window class="settings-window" v-model="tab">
@@ -23,7 +23,7 @@
             <DifficultySelector @close="closeModal" />
           </v-window-item>
           <v-window-item class="settings-window-item" value="color">
-            <ColorPaletteSelector />
+            <ThemeSelector />
           </v-window-item>
         </v-window>
       </div>
@@ -34,13 +34,13 @@
 <script lang="ts">
 import { defineComponent } from "vue"
 import DifficultySelector from "./DifficultySelector.vue"
-import ColorPaletteSelector from "./ColorPaletteSelector.vue"
+import ThemeSelector from "./ThemeSelector.vue"
 
 export default defineComponent({
   name: "Settings",
   components: {
     DifficultySelector,
-    ColorPaletteSelector,
+    ThemeSelector,
   },
   props: {
     modelValue: {
