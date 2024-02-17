@@ -7,7 +7,6 @@ export const useStore = defineStore("defaultStore", {
     game: DifficultyLevel.EASY,
     markedBombs: 0,
     boardData: [],
-    mines: [],
     status: Status.MENU,
     theme: window.localStorage.getItem("theme") || "light",
   }),
@@ -54,6 +53,19 @@ export const useStore = defineStore("defaultStore", {
       return state.boardData.some((arr) =>
         arr.some((innerArr) => innerArr.hasMine && innerArr.isRevealed)
       )
+    },
+    mines: (state): Array<number[]> => {
+      return state.boardData.reduce((mines, row, idx) => {
+        return [
+          ...mines,
+          ...row.reduce((minesInner, col, idy) => {
+            if (col.hasMine) {
+              minesInner.push([idx, idy])
+            }
+            return minesInner
+          }, [] as Array<number[]>),
+        ]
+      }, [] as Array<number[]>)
     },
   },
   actions: {

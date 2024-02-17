@@ -11,7 +11,6 @@ export interface defaultStore {
   game: DifficultyLevel
   markedBombs: number
   boardData: Array<IPlotData[]>
-  mines: Array<number[]> | []
   status: Status
   theme: string
 }

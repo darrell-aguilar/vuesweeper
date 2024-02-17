@@ -3,7 +3,7 @@
     <div class="board-menu my-5">
       <Settings v-model="showSettings" @click="showSettingsModal" />
     </div>
-    <!-- <Confetti /> -->
+    <Confetti :show="won" />
     <Timer :timer-status="timerState" />
     <Result v-model="showResult" @restart="restart" />
     <template v-if="boardData.length">
@@ -46,6 +46,7 @@ export default defineComponent({
       showSettings: false,
       showResult: false,
       timerState: TimerStatus.START,
+      firstPlotClicked: false,
     }
   },
   computed: {
@@ -123,24 +124,38 @@ export default defineComponent({
       }
       return data
     },
-    plotBombs(matrix: Array<Array<IPlotData>>) {
-      let bombsSet = 0
-      let minesLocation = []
-      while (bombsSet < this.config.bombs) {
-        let xAxis = Math.floor(Math.random() * this.config.width)
-        let yAxis = Math.floor(Math.random() * this.config.height)
-
+    bombChecker(matrix: Array<Array<IPlotData>>) {
+      while (true) {
+        const xAxis = Math.floor(Math.random() * this.config.width)
+        const yAxis = Math.floor(Math.random() * this.config.height)
         if (!matrix[xAxis][yAxis].hasMine) {
-          matrix[xAxis][yAxis].hasMine = true
-          minesLocation.push([xAxis, yAxis])
-          bombsSet++
+          return [xAxis, yAxis]
         }
       }
-      this.store.mines = minesLocation
+    },
+    plotBombs(matrix: Array<Array<IPlotData>>) {
+      let bombsSet = 0
+      while (bombsSet < this.config.bombs) {
+        const [x, y] = this.bombChecker(matrix)
+        matrix[x][y].hasMine = true
+        bombsSet++
+      }
       return matrix
     },
     clickEventHandler(x: number, y: number) {
-      if (this.lost || this.store.winner) return
+      if (this.lost || this.won) return
+
+      if (!this.firstPlotClicked) {
+        const firstHasMine = this.store.mines.find(
+          (mine) => mine[0] === x && mine[1] === y
+        )
+        if (firstHasMine) {
+          const [bombX, bombY] = this.bombChecker(this.boardData)
+          this.boardData[bombX][bombY].hasMine = true
+          this.boardData[x][y].hasMine = false
+        }
+        this.firstPlotClicked = true
+      }
 
       let box = this.boardData[x][y]
 

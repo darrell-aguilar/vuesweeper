@@ -8,12 +8,24 @@ import confetti from "canvas-confetti"
 
 export default defineComponent({
   name: "Confetti",
-  mounted() {
-    this.spread()
+  props: {
+    show: {
+      type: Boolean,
+    },
+  },
+  watch: {
+    show: {
+      handler(value) {
+        if (value) this.spread()
+      },
+    },
   },
   methods: {
     spread() {
-      confetti()
+      confetti({
+        particleCount: 200,
+        spread: 90,
+      })
     },
   },
 })
