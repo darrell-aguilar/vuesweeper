@@ -78,9 +78,6 @@ export const useStore = defineStore("defaultStore", {
     updateGameStatus(value: any) {
       this.status = value
     },
-    setMines(value: any) {
-      this.mines = value
-    },
     setTheme(newTheme: string) {
       this.theme = newTheme
       window.localStorage.setItem("theme", newTheme)

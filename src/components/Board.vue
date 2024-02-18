@@ -84,9 +84,6 @@ export default defineComponent({
       },
       immediate: true,
     },
-    difficulty() {
-      this.setupGame()
-    },
     lost: {
       handler(lost) {
         if (lost) {
@@ -106,7 +103,7 @@ export default defineComponent({
     setupGame() {
       const matrix = this.createMatrix()
       const matrixWithBombs = this.plotBombs(matrix)
-      this.boardData = matrixWithBombs
+      this.store.setBoardData(matrixWithBombs)
     },
     createMatrix() {
       let data: Array<Array<IPlotData>> = []
