@@ -11,8 +11,13 @@
       v-if="data.isFlagged && !data.isRevealed"
       color="red"
       icon="mdi-flag"
+      ref="flag"
     ></v-icon>
-    <Transition name="bomb">
+    <Transition
+      v-else-if="data.hasMine && !data.isFlagged && data.isRevealed"
+      name="bomb"
+      ref="bomb"
+    >
       <v-icon
         class="plot-icon"
         v-if="data.hasMine && !data.isFlagged && data.isRevealed"
@@ -23,11 +28,12 @@
     <p
       class="plot-neighbour"
       :class="color"
-      v-if="data.neighboursWithMine && data.isRevealed"
+      v-else-if="data.neighboursWithMine && data.isRevealed"
+      ref="count"
     >
       {{ data.neighboursWithMine }}
     </p>
-    <div class="plot-default" v-else></div>
+    <div v-else class="plot-default" ref="default"></div>
   </div>
 </template>
 
@@ -36,7 +42,6 @@ import { useStore } from "../store/index"
 import { defineComponent, PropType } from "vue"
 import { Colors } from "../utils/constants"
 import { IPlotData } from "../types/types"
-import bombAudio from "../assets/bomb-explode.wav"
 
 export default defineComponent({
   name: "Plot",
@@ -44,7 +49,6 @@ export default defineComponent({
   data() {
     return {
       store: useStore(),
-      audioFile: new Audio(bombAudio),
       bomb: "mdi-bomb",
       bombStyle: {},
     }
@@ -69,7 +73,6 @@ export default defineComponent({
       handler(newData) {
         if (newData.isRevealed && newData.hasMine) {
           setTimeout(() => {
-            this.audioFile.play()
             this.bomb = "mdi-bomb-off"
             this.bombStyle = {
               backgroundColor: "red",

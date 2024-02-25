@@ -8,7 +8,7 @@ export const Colors = {
   1: "text-blue",
   2: "text-green",
   3: "text-red",
-  4: "text-dark-blue",
+  4: "text-blue-darken-4",
   5: "text-brown",
   6: "text-cyan",
   7: "text-black",

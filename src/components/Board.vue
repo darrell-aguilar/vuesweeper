@@ -8,7 +8,7 @@
     <Result v-model="showResult" @restart="restart" />
     <template v-if="boardData.length">
       <div class="board-flag">
-        <v-icon icon="mdi-flag" color="red"></v-icon> {{ store.flagsLeft }}
+        <v-icon icon="mdi-flag" color="red"></v-icon> {{ flagsLeft }}
       </div>
       <div class="board-container">
         <div class="board-row" v-for="(xAxis, idx) in boardData" :key="idx">
@@ -36,13 +36,13 @@ import Settings from "./Settings.vue"
 import Timer from "./Timer.vue"
 import Result from "./Result.vue"
 import Confetti from "./Confetti.vue"
+import { mapState, mapActions } from "pinia"
 
 export default defineComponent({
   name: "Board",
   components: { Plot, Settings, Timer, Result, Confetti },
   data() {
     return {
-      store: useStore(),
       showSettings: false,
       showResult: false,
       timerState: TimerStatus.START,
@@ -50,32 +50,19 @@ export default defineComponent({
     }
   },
   computed: {
-    boardData: {
-      set(value: any) {
-        this.store.setBoardData(value)
-      },
-      get() {
-        return this.store.boardData
-      },
-    },
-    config() {
-      return this.store.gameConfig
-    },
     totalBoxes() {
       return this.config.height * this.config.width
     },
-    lost() {
-      return this.store.loser
-    },
-    won() {
-      return this.store.winner
-    },
-    difficulty() {
-      return this.store.game
-    },
-    allBombsVisible() {
-      return this.store.allBombsVisible
-    },
+    ...mapState(useStore, {
+      boardData: "boardData",
+      config: "gameConfig",
+      lost: "loser",
+      won: "winner",
+      difficulty: "game",
+      allBombsVisible: "allBombsVisible",
+      mines: "mines",
+      flagsLeft: "flagsLeft",
+    }),
   },
   watch: {
     config: {
@@ -100,10 +87,14 @@ export default defineComponent({
     },
   },
   methods: {
+    ...mapActions(useStore, {
+      setBoardData: "setBoardData",
+    }),
     setupGame() {
+      this.firstPlotClicked = false
       const matrix = this.createMatrix()
       const matrixWithBombs = this.plotBombs(matrix)
-      this.store.setBoardData(matrixWithBombs)
+      this.setBoardData(matrixWithBombs)
     },
     createMatrix() {
       let data: Array<Array<IPlotData>> = []
@@ -143,13 +134,13 @@ export default defineComponent({
       if (this.lost || this.won) return
 
       if (!this.firstPlotClicked) {
-        const firstHasMine = this.store.mines.find(
+        const firstHasMine = this.mines.find(
           (mine) => mine[0] === x && mine[1] === y
         )
         if (firstHasMine) {
           const [bombX, bombY] = this.bombChecker(this.boardData)
-          this.boardData[bombX][bombY].hasMine = true
           this.boardData[x][y].hasMine = false
+          this.boardData[bombX][bombY].hasMine = true
         }
         this.firstPlotClicked = true
       }
@@ -163,7 +154,7 @@ export default defineComponent({
         return
       }
 
-      navigateNeighbours(x, y, this.store.gameConfig, this.store.boardData)
+      navigateNeighbours(x, y, this.config, this.boardData)
     },
     flag(x: number, y: number) {
       if (this.lost || this.boardData[x][y].isRevealed) return
@@ -171,13 +162,13 @@ export default defineComponent({
       this.boardData[x][y].isFlagged = !this.boardData[x][y].isFlagged
     },
     showMines(x: number, y: number) {
-      this.store.boardData[x][y].isFlagged = false
-      this.store.boardData[x][y].isRevealed = true
+      this.boardData[x][y].isFlagged = false
+      this.boardData[x][y].isRevealed = true
 
-      this.store.mines.forEach(([row, col], i) => {
+      this.mines.forEach(([row, col], i) => {
         setTimeout(() => {
-          this.store.boardData[row][col].isFlagged = false
-          this.store.boardData[row][col].isRevealed = true
+          this.boardData[row][col].isFlagged = false
+          this.boardData[row][col].isRevealed = true
         }, (i + 1) * 200)
       })
     },

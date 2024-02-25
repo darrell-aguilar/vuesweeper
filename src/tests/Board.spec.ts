@@ -6,7 +6,6 @@ import { useStore } from "../store"
 import { createVuetify } from "vuetify"
 import { DifficultyLevel } from "../utils/constants"
 import { flushPromises } from "@vue/test-utils"
-import { navigateNeighbours } from "../utils/helpers"
 
 vi.mock("../utils/helpers")
 
