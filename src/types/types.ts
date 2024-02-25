@@ -13,4 +13,5 @@ export interface defaultStore {
   boardData: Array<IPlotData[]>
   status: Status
   theme: string
+  timer: string | null
 }

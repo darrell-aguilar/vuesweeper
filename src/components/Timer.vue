@@ -1,10 +1,17 @@
 <template>
-  <div>{{ formattedTime }}</div>
+  <div>
+    <span
+      ><v-icon class="mx-2" icon="mdi-clock-time-five"></v-icon
+      >{{ formattedTime }}</span
+    >
+  </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue"
 import { TimerStatus } from "../utils/constants"
+import { mapActions } from "pinia"
+import { useStore } from "../store"
 
 export default defineComponent({
   name: "Timer",
@@ -42,7 +49,9 @@ export default defineComponent({
           case TimerStatus.START:
             clearInterval(this.timer)
             this.time = 0
-            this.timer = setInterval(() => this.time++, 1000)
+            this.timer = setInterval(() => {
+              this.time++
+            }, 1000)
             break
           case TimerStatus.PAUSE:
             clearInterval(this.timer)
@@ -53,6 +62,12 @@ export default defineComponent({
       },
       immediate: true,
     },
+    formattedTime(val) {
+      this.updateTimer(val)
+    },
+  },
+  methods: {
+    ...mapActions(useStore, ["updateTimer"]),
   },
 })
 </script>

@@ -4,11 +4,17 @@
       <Settings v-model="showSettings" @click="showSettingsModal" />
     </div>
     <Confetti :show="won" />
-    <Timer :timer-status="timerState" />
-    <Result v-model="showResult" @restart="restart" />
+    <Result v-model="showResult" @restart="restart">
+      <template #winner-content>
+        <h2>Total time: {{ timer }}</h2>
+      </template>
+    </Result>
     <template v-if="boardData.length">
       <div class="board-flag">
-        <v-icon icon="mdi-flag" color="red"></v-icon> {{ flagsLeft }}
+        <span
+          ><v-icon icon="mdi-flag" color="red"></v-icon>{{ flagsLeft }}</span
+        >
+        <Timer :timer-status="timerState" />
       </div>
       <div class="board-container">
         <div class="board-row" v-for="(xAxis, idx) in boardData" :key="idx">
@@ -62,6 +68,7 @@ export default defineComponent({
       allBombsVisible: "allBombsVisible",
       mines: "mines",
       flagsLeft: "flagsLeft",
+      timer: "timer",
     }),
   },
   watch: {
@@ -82,6 +89,14 @@ export default defineComponent({
       handler(visible) {
         if (visible) {
           this.showResult = true
+        }
+      },
+    },
+    won: {
+      handler(result) {
+        if (result) {
+          this.timerState = TimerStatus.PAUSE
+          setTimeout(() => (this.showResult = true), 500)
         }
       },
     },
@@ -179,6 +194,7 @@ export default defineComponent({
     restart() {
       this.setupGame()
       this.showResult = false
+      this.timerState = TimerStatus.START
     },
   },
 })
@@ -189,10 +205,14 @@ export default defineComponent({
   text-align: center;
 
   &-flag {
-    display: block;
+    max-width: 300px;
+    display: flex;
     font-size: 1.25rem;
-    margin: 2rem 0;
+    margin: 2rem auto;
+    justify-content: space-around;
+    align-items: center;
   }
+
   &-container {
     display: flex;
     flex-direction: row;

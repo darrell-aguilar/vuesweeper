@@ -9,6 +9,7 @@ export const useStore = defineStore("defaultStore", {
     boardData: [],
     status: Status.MENU,
     theme: window.localStorage.getItem("theme") || "light",
+    timer: null,
   }),
   getters: {
     gameConfig: (state) => DIFFICULTY[state.game],
@@ -81,6 +82,9 @@ export const useStore = defineStore("defaultStore", {
     setTheme(newTheme: string) {
       this.theme = newTheme
       window.localStorage.setItem("theme", newTheme)
+    },
+    updateTimer(val: string) {
+      this.timer = val
     },
   },
 })
