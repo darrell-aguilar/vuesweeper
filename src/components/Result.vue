@@ -3,11 +3,13 @@
     <v-card class="result-card" v-if="store.winner">
       <h2 class="result-text">You won!</h2>
       <slot name="winner-content"></slot>
-      <v-btn @click="$emit('restart')">Play Again</v-btn>
+      <v-btn class="result-button" @click="$emit('restart')">Play Again</v-btn>
     </v-card>
     <v-card class="result-card" v-else-if="store.loser">
       <h2 class="result-text">You lost!</h2>
-      <v-btn @click="$emit('restart')">Restart Game</v-btn>
+      <v-btn class="result-button" @click="$emit('restart')">
+        Restart Game
+      </v-btn>
     </v-card>
   </v-overlay>
 </template>
@@ -52,6 +54,11 @@ export default defineComponent({
   &-card {
     min-width: 300px;
     padding: 4rem;
+  }
+
+  &-button {
+    margin: 2rem auto;
+    width: 100%;
   }
 
   &-text {

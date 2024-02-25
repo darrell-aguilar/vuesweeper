@@ -24,7 +24,7 @@ export default defineComponent({
     spread() {
       confetti({
         particleCount: 200,
-        spread: 90,
+        spread: 120,
       })
     },
   },
