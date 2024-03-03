@@ -30,8 +30,11 @@ export default defineComponent({
       store: useStore(),
       Difficulty: DifficultyLevel,
       difficultyColors: ["green-darken-2", "yellow-darken-2", "red-darken-2"],
-      selectDifficulty: null,
+      selectDifficulty: null as null | DifficultyLevel,
     }
+  },
+  mounted() {
+    this.selectDifficulty = this.store.game
   },
   methods: {
     updateDifficulty() {

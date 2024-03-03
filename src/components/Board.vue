@@ -100,6 +100,20 @@ export default defineComponent({
         }
       },
     },
+    async difficulty() {
+      this.timerState = TimerStatus.PAUSE
+      await this.$nextTick()
+      this.restart()
+    },
+    showSettings: {
+      async handler(value) {
+        if (value) {
+          this.timerState = TimerStatus.PAUSE
+          return
+        }
+        this.timerState = TimerStatus.RESUME
+      },
+    },
   },
   methods: {
     ...mapActions(useStore, {
@@ -184,7 +198,7 @@ export default defineComponent({
         setTimeout(() => {
           this.boardData[row][col].isFlagged = false
           this.boardData[row][col].isRevealed = true
-        }, (i + 1) * 200)
+        }, (i + 1) * 80)
       })
     },
     showSettingsModal() {
