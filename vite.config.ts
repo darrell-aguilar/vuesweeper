@@ -16,6 +16,11 @@ export default defineConfig(() => {
       environment: "jsdom",
       globals: true,
       include: ["**/tests/*.{ts, js}"],
+      server: {
+        deps: {
+          inline: ["vuetify"],
+        },
+      },
     },
   }
 })

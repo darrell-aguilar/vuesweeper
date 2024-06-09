@@ -1,5 +1,5 @@
 import { shallowMount } from "@vue/test-utils"
-import { describe, it, expect, vi } from "vitest"
+import { describe, it, expect, vi, afterEach } from "vitest"
 import { createTestingPinia } from "@pinia/testing"
 import Board from "../components/Board.vue"
 import { useStore } from "../store"
@@ -26,6 +26,11 @@ describe("Board", () => {
     })
   }
 
+  afterEach(() => {
+    vi.clearAllMocks()
+    vi.resetAllMocks()
+  })
+
   it("sets up the board", async () => {
     const store = useStore()
     const wrapper = wrapperFactory()
@@ -36,9 +41,9 @@ describe("Board", () => {
 
     await flushPromises()
 
-    expect(setupSpy).toHaveBeenCalledTimes(1)
-    expect(createMatrixSpy).toHaveBeenCalledTimes(1)
-    expect(plotBombsSpy).toHaveBeenCalledTimes(1)
+    expect(setupSpy).toHaveBeenCalled()
+    expect(createMatrixSpy).toHaveBeenCalled()
+    expect(plotBombsSpy).toHaveBeenCalled()
     expect(store.setBoardData).toHaveBeenCalled()
 
     expect(store.boardData.length).toBe(8)

@@ -1,5 +1,5 @@
 import { shallowMount } from "@vue/test-utils"
-import { describe, it, expect, vi } from "vitest"
+import { describe, it, expect } from "vitest"
 import { createTestingPinia } from "@pinia/testing"
 import { createVuetify } from "vuetify"
 import Plot from "../components/Plot.vue"
@@ -16,7 +16,6 @@ describe("Plot", () => {
       },
       global: {
         plugins: [pinia, vuetify],
-
         stubs: {
           VIcon: {
             template: '<div class="v-icon"></div>',
