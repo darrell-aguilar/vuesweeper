@@ -94,8 +94,11 @@ export default defineComponent({
   }
 
   &-window-item {
-    max-width: 80vw;
-    min-width: 50vw;
+    min-width: 80vw;
+
+    @include sm {
+      min-width: 50vw;
+    }
   }
 }
 </style>

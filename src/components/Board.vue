@@ -52,7 +52,6 @@ export default defineComponent({
       showResult: false,
       timerState: TimerStatus.START,
       isFirstClick: true,
-      flags: 0,
     }
   },
   computed: {
@@ -67,6 +66,7 @@ export default defineComponent({
       difficulty: "difficulty",
       allBombsVisible: "allBombsVisible",
       timer: "timer",
+      flags: "flags",
     }),
   },
   watch: {
@@ -116,9 +116,11 @@ export default defineComponent({
   methods: {
     ...mapActions(useStore, {
       setBoardData: "setBoardData",
+      setFlagCount: "setFlagCount",
+      updateFlagCount: "updateFlagCount",
     }),
     setupGame() {
-      this.flags = this.config.bombs
+      this.setFlagCount(this.config.bombs)
       this.isFirstClick = true
       const matrix = this.createMatrix()
       this.setBoardData(matrix)
@@ -190,9 +192,6 @@ export default defineComponent({
 
       this.boardData[x][y].isFlagged = addFlag
       this.updateFlagCount(addFlag ? -1 : 1)
-    },
-    updateFlagCount(value: number) {
-      this.flags += value
     },
     showMines(x: number, y: number) {
       this.boardData[x][y].isFlagged = false
