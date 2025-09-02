@@ -1,31 +1,18 @@
 import { defineStore } from "pinia"
-import { DifficultyLevel, DIFFICULTY, Status } from "../utils/constants"
-import { defaultStore } from "../types/types"
+import { DifficultyModes, DIFFICULTY, Status } from "../utils/constants"
+import { DefaultStore, DifficultyLevel } from "../types/types"
 
 export const useStore = defineStore("defaultStore", {
-  state: (): defaultStore => ({
-    game: DifficultyLevel.EASY,
-    markedBombs: 0,
+  state: (): DefaultStore => ({
+    difficulty: DifficultyModes.EASY,
     boardData: [],
     status: Status.MENU,
+    flags: 0,
     theme: window.localStorage.getItem("theme") || "light",
     timer: null,
   }),
   getters: {
-    gameConfig: (state) => DIFFICULTY[state.game],
-    flagsLeft(): number {
-      return (
-        this.gameConfig.bombs -
-        this.boardData.reduce((sum, arr) => {
-          return (
-            sum +
-            arr.reduce((innerSum, innerArr) => {
-              return innerArr.isFlagged ? innerSum + 1 : innerSum
-            }, 0)
-          )
-        }, 0)
-      )
-    },
+    gameConfig: (state): DifficultyLevel => DIFFICULTY[state.difficulty],
     allBombsVisible(): boolean {
       return (
         this.gameConfig.bombs ===
@@ -55,23 +42,10 @@ export const useStore = defineStore("defaultStore", {
         arr.some((innerArr) => innerArr.hasMine && innerArr.isRevealed)
       )
     },
-    mines: (state): Array<number[]> => {
-      return state.boardData.reduce((mines, row, idx) => {
-        return [
-          ...mines,
-          ...row.reduce((minesInner, col, idy) => {
-            if (col.hasMine) {
-              minesInner.push([idx, idy])
-            }
-            return minesInner
-          }, [] as Array<number[]>),
-        ]
-      }, [] as Array<number[]>)
-    },
   },
   actions: {
-    setDifficulty(value: any) {
-      this.game = value
+    setDifficulty(value: DifficultyModes) {
+      this.difficulty = value
     },
     setBoardData(value: any) {
       this.boardData = value
@@ -85,6 +59,12 @@ export const useStore = defineStore("defaultStore", {
     },
     updateTimer(val: string) {
       this.timer = val
+    },
+    setFlagCount(flagCount: number) {
+      this.flags = flagCount
+    },
+    updateFlagCount(value: number) {
+      this.flags += value
     },
   },
 })

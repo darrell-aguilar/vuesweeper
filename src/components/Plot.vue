@@ -13,25 +13,21 @@
       icon="mdi-flag"
       ref="flag"
     ></v-icon>
-    <Transition
-      v-else-if="data.hasMine && !data.isFlagged && data.isRevealed"
-      name="bomb"
-      ref="bomb"
-    >
+    <p v-if="data.hasMine && !data.isFlagged && data.isRevealed">
       <v-icon
         class="plot-icon"
-        v-if="data.hasMine && !data.isFlagged && data.isRevealed"
+        :class="{ 'plot-bombed': animateBomb }"
         :icon="bomb"
         color="black"
       ></v-icon>
-    </Transition>
+    </p>
     <p
       class="plot-neighbour"
       :class="color"
-      v-else-if="data.neighboursWithMine && data.isRevealed"
+      v-else-if="data.adjacentMines && data.isRevealed"
       ref="count"
     >
-      {{ data.neighboursWithMine }}
+      {{ data.adjacentMines }}
     </p>
     <div v-else class="plot-default" ref="default"></div>
   </div>
@@ -51,6 +47,7 @@ export default defineComponent({
       store: useStore(),
       bomb: "mdi-bomb",
       bombStyle: {},
+      animateBomb: false,
     }
   },
   props: {
@@ -61,8 +58,8 @@ export default defineComponent({
   },
   computed: {
     color() {
-      if (!this.data.neighboursWithMine) return
-      return Colors[this.data.neighboursWithMine as keyof typeof Colors]
+      if (!this.data.adjacentMines) return
+      return Colors[this.data.adjacentMines as keyof typeof Colors]
     },
     lost() {
       return this.store.loser
@@ -72,12 +69,8 @@ export default defineComponent({
     data: {
       handler(newData) {
         if (newData.isRevealed && newData.hasMine) {
-          setTimeout(() => {
-            this.bomb = "mdi-bomb-off"
-            this.bombStyle = {
-              backgroundColor: "red",
-            }
-          }, 600)
+          this.animateBomb = true
+          setTimeout(() => (this.bombStyle = { backgroundColor: "red" }), 300)
         } else this.bombStyle = {}
       },
       deep: true,
@@ -119,6 +112,27 @@ export default defineComponent({
     background-color: white;
   }
 
+  &-bombed {
+    animation: popBomb 0.8s ease-out forwards;
+  }
+
+  @keyframes popBomb {
+    0% {
+      transform: scale(1) rotate(0deg);
+      opacity: 1;
+    }
+    30% {
+      transform: scale(1.3) rotate(-15deg);
+    }
+    60% {
+      transform: scale(0.8) rotate(15deg);
+    }
+    100% {
+      transform: scale(2) rotate(0deg);
+      opacity: 0;
+    }
+  }
+
   &-icon {
     vertical-align: bottom;
     margin-top: 0.125rem;
@@ -138,9 +152,5 @@ export default defineComponent({
       margin-top: 0.125rem;
     }
   }
-}
-
-.bomb-enter-active {
-  animation: bomb-animation 1s ease-out;
 }
 </style>

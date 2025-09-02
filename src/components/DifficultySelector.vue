@@ -2,7 +2,7 @@
   <div class="difficulty">
     <h2 class="difficulty-title">DIFFICULTY</h2>
     <h3 class="difficulty-header">Select a difficulty</h3>
-    <v-radio-group v-model="selectDifficulty">
+    <v-radio-group v-model="difficulty">
       <v-radio
         class="difficulty-selection"
         v-for="(difficulty, value, idx) in Difficulty"
@@ -20,7 +20,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue"
-import { DifficultyLevel } from "../utils/constants"
+import { DifficultyModes } from "../utils/constants"
 import { useStore } from "../store"
 
 export default defineComponent({
@@ -28,18 +28,20 @@ export default defineComponent({
   data() {
     return {
       store: useStore(),
-      Difficulty: DifficultyLevel,
+      Difficulty: DifficultyModes,
       difficultyColors: ["green-darken-2", "yellow-darken-2", "red-darken-2"],
-      selectDifficulty: null as null | DifficultyLevel,
+      difficulty: null as null | DifficultyModes,
     }
   },
   mounted() {
-    this.selectDifficulty = this.store.game
+    this.difficulty = this.store.difficulty
   },
   methods: {
     updateDifficulty() {
-      this.store.setDifficulty(this.selectDifficulty)
-      this.closeModal()
+      if (this.difficulty) {
+        this.store.setDifficulty(this.difficulty)
+        this.closeModal()
+      }
     },
     closeModal() {
       this.$emit("close")

@@ -1,6 +1,6 @@
 import { type ThemeDefinition } from "vuetify"
 
-export const darkTheme: ThemeDefinition = {
+export const grey: ThemeDefinition = {
   dark: true,
   colors: {
     background: "#6A7574",

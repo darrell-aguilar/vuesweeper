@@ -1,4 +1,6 @@
-export const DIFFICULTY = {
+import { DifficultyLevel } from "../types/types"
+
+export const DIFFICULTY: Record<DifficultyModes, DifficultyLevel> = {
   EASY: { height: 10, width: 6, bombs: 12 },
   MEDIUM: { height: 12, width: 8, bombs: 20 },
   HARD: { height: 14, width: 10, bombs: 28 },
@@ -13,9 +15,9 @@ export const Colors = {
   6: "text-cyan",
   7: "text-black",
   8: "text-grey",
-}
+} as const
 
-export enum DifficultyLevel {
+export enum DifficultyModes {
   EASY = "EASY",
   MEDIUM = "MEDIUM",
   HARD = "HARD",

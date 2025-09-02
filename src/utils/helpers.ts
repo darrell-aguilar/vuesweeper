@@ -1,4 +1,5 @@
 import { IPlotData } from "../types/types"
+import { useStore } from "../store"
 
 export const disableContextMenu = () =>
   window.addEventListener(
@@ -9,37 +10,6 @@ export const disableContextMenu = () =>
     false
   )
 
-export const includedInArray = <T>(
-  shortArray: Array<T>,
-  data: Array<Array<T>>
-): boolean => {
-  return data.some(
-    (pair) => pair[0] === shortArray[0] && pair[1] === shortArray[1]
-  )
-}
-
-export const checkNeighbours = (
-  x: number,
-  y: number,
-  config: any,
-  matrix: Array<IPlotData[]>
-) => {
-  let height = config.height
-  let width = config.width
-  let neighbours = 0
-
-  for (let i = -1; i <= 1; i++) {
-    for (let j = -1; j <= 1; j++) {
-      let xOffset = i + x
-      let yOffset = j + y
-      if (xOffset > -1 && xOffset < width && yOffset > -1 && yOffset < height) {
-        if (matrix[x + i][y + j].hasMine) neighbours++
-      }
-    }
-  }
-  return neighbours
-}
-
 //  navigates all neighbours recursively
 export const navigateNeighbours = (
   x: number,
@@ -47,14 +17,20 @@ export const navigateNeighbours = (
   config: any,
   matrix: Array<IPlotData[]>
 ) => {
+  const store = useStore()
+
   const neighbours = findNeighbours(x, y, config, matrix)
   const mines: number = countMines(neighbours, matrix)
 
-  matrix[x][y].isRevealed = true
-  matrix[x][y].isFlagged = false
+  const box = matrix[x][y]
+  box.isRevealed = true
+  if (box.isFlagged) {
+    store.updateFlagCount(1)
+    box.isFlagged = false
+  }
 
   if (mines > 0) {
-    matrix[x][y].neighboursWithMine = mines
+    matrix[x][y].adjacentMines = mines
   } else {
     for (let [idx, idy] of neighbours) {
       navigateNeighbours(idx, idy, config, matrix)
@@ -110,19 +86,5 @@ const countMines = (
 }
 
 export const themeNameFormatter = (themeName: string) => {
-  if (!themeName.length) return ""
-  let formattedThemeName = ""
-  themeName.split("").forEach((char, id) => {
-    if (id === 0) {
-      formattedThemeName += char.toUpperCase()
-      return
-    }
-
-    if (char === char.toLowerCase()) {
-      formattedThemeName += char
-    } else {
-      formattedThemeName = formattedThemeName.concat(" ", char)
-    }
-  })
-  return formattedThemeName
+  return themeName.charAt(0).toUpperCase().concat(themeName.slice(1))
 }

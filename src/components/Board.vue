@@ -11,15 +11,14 @@
     </Result>
     <template v-if="boardData.length">
       <div class="board-flag">
-        <span
-          ><v-icon icon="mdi-flag" color="red"></v-icon>{{ flagsLeft }}</span
-        >
+        <span><v-icon icon="mdi-flag" color="red"></v-icon>{{ flags }}</span>
         <Timer :timer-status="timerState" />
       </div>
       <div class="board-container">
         <div class="board-row" v-for="(xAxis, idx) in boardData" :key="idx">
           <Plot
             v-for="(yAxis, idy) in xAxis"
+            :tabindex="idy * config.width + idx + 1"
             :key="idy"
             :data="yAxis"
             @click="clickEventHandler(idx, idy)"
@@ -52,7 +51,8 @@ export default defineComponent({
       showSettings: false,
       showResult: false,
       timerState: TimerStatus.START,
-      firstPlotClicked: false,
+      isFirstClick: true,
+      flags: 0,
     }
   },
   computed: {
@@ -64,10 +64,8 @@ export default defineComponent({
       config: "gameConfig",
       lost: "loser",
       won: "winner",
-      difficulty: "game",
+      difficulty: "difficulty",
       allBombsVisible: "allBombsVisible",
-      mines: "mines",
-      flagsLeft: "flagsLeft",
       timer: "timer",
     }),
   },
@@ -120,28 +118,31 @@ export default defineComponent({
       setBoardData: "setBoardData",
     }),
     setupGame() {
-      this.firstPlotClicked = false
+      this.flags = this.config.bombs
+      this.isFirstClick = true
       const matrix = this.createMatrix()
-      const matrixWithBombs = this.plotBombs(matrix)
-      this.setBoardData(matrixWithBombs)
+      this.setBoardData(matrix)
     },
     createMatrix() {
-      let data: Array<Array<IPlotData>> = []
+      const { height, width } = this.config
+      const data: Array<Array<IPlotData>> = Array(width)
+        .fill(null)
+        .map(() =>
+          Array(height)
+            .fill(height)
+            .map(() => {
+              return {
+                hasMine: false,
+                adjacentMines: 0,
+                isRevealed: false,
+                isFlagged: false,
+              }
+            })
+        )
 
-      for (let i = 0; i < this.config.width; i++) {
-        data.push([])
-        for (let j = 0; j < this.config.height; j++) {
-          data[i][j] = {
-            hasMine: false,
-            neighboursWithMine: 0,
-            isRevealed: false,
-            isFlagged: false,
-          }
-        }
-      }
       return data
     },
-    bombChecker(matrix: Array<Array<IPlotData>>) {
+    allocateBombAxis(matrix: Array<Array<IPlotData>>) {
       while (true) {
         const xAxis = Math.floor(Math.random() * this.config.width)
         const yAxis = Math.floor(Math.random() * this.config.height)
@@ -150,33 +151,30 @@ export default defineComponent({
         }
       }
     },
-    plotBombs(matrix: Array<Array<IPlotData>>) {
+    plotBombs(matrix: Array<Array<IPlotData>>, xAxis: number, yAxis: number) {
       let bombsSet = 0
       while (bombsSet < this.config.bombs) {
-        const [x, y] = this.bombChecker(matrix)
-        matrix[x][y].hasMine = true
-        bombsSet++
+        const [x, y] = this.allocateBombAxis(matrix)
+        if (x != xAxis && y != yAxis) {
+          matrix[x][y].hasMine = true
+          bombsSet++
+        }
       }
       return matrix
     },
     clickEventHandler(x: number, y: number) {
-      if (this.lost || this.won) return
-
-      if (!this.firstPlotClicked) {
-        const firstHasMine = this.mines.find(
-          (mine) => mine[0] === x && mine[1] === y
-        )
-        if (firstHasMine) {
-          const [bombX, bombY] = this.bombChecker(this.boardData)
-          this.boardData[x][y].hasMine = false
-          this.boardData[bombX][bombY].hasMine = true
-        }
-        this.firstPlotClicked = true
+      if (this.isFirstClick) {
+        this.setBoardData(this.plotBombs(this.boardData, x, y))
+        this.isFirstClick = false
       }
 
-      let box = this.boardData[x][y]
+      if (this.lost || this.won) return
 
-      box.isFlagged = false
+      let box = this.boardData[x][y]
+      if (box.isFlagged) {
+        box.isFlagged = false
+        this.updateFlagCount(1)
+      }
 
       if (box.hasMine) {
         this.showMines(x, y)
@@ -186,19 +184,27 @@ export default defineComponent({
       navigateNeighbours(x, y, this.config, this.boardData)
     },
     flag(x: number, y: number) {
-      if (this.lost || this.boardData[x][y].isRevealed) return
+      if (this.lost || this.boardData[x][y].isRevealed || this.flags == 0)
+        return
+      const addFlag = !this.boardData[x][y].isFlagged
 
-      this.boardData[x][y].isFlagged = !this.boardData[x][y].isFlagged
+      this.boardData[x][y].isFlagged = addFlag
+      this.updateFlagCount(addFlag ? -1 : 1)
+    },
+    updateFlagCount(value: number) {
+      this.flags += value
     },
     showMines(x: number, y: number) {
       this.boardData[x][y].isFlagged = false
       this.boardData[x][y].isRevealed = true
 
-      this.mines.forEach(([row, col], i) => {
-        setTimeout(() => {
-          this.boardData[row][col].isFlagged = false
-          this.boardData[row][col].isRevealed = true
-        }, (i + 1) * 80)
+      this.boardData.forEach((row) => {
+        row.forEach((col) => {
+          const randomTime = Math.random() * 2000
+          setTimeout(() => {
+            if (col.hasMine) col.isRevealed = true
+          }, randomTime)
+        })
       })
     },
     showSettingsModal() {

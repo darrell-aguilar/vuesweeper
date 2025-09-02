@@ -28,7 +28,7 @@ describe("Plot", () => {
   const defaultProps = {
     data: <IPlotData>{
       hasMine: false,
-      neighboursWithMine: 1,
+      adjacentMines: 1,
       isRevealed: false,
       isFlagged: false,
     },

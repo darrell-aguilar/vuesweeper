@@ -4,7 +4,7 @@ import { createTestingPinia } from "@pinia/testing"
 import Board from "../components/Board.vue"
 import { useStore } from "../store"
 import { createVuetify } from "vuetify"
-import { DifficultyLevel } from "../utils/constants"
+import { DifficultyModes } from "../utils/constants"
 import { flushPromises } from "@vue/test-utils"
 
 vi.mock("../utils/helpers")
@@ -34,37 +34,35 @@ describe("Board", () => {
   it("sets up the board", async () => {
     const store = useStore()
     const wrapper = wrapperFactory()
-    store.game = DifficultyLevel.MEDIUM
+    store.difficulty = DifficultyModes.MEDIUM
     const setupSpy = vi.spyOn(wrapper.vm, "setupGame")
     const createMatrixSpy = vi.spyOn(wrapper.vm, "createMatrix")
-    const plotBombsSpy = vi.spyOn(wrapper.vm, "plotBombs")
 
     await flushPromises()
 
     expect(setupSpy).toHaveBeenCalled()
     expect(createMatrixSpy).toHaveBeenCalled()
-    expect(plotBombsSpy).toHaveBeenCalled()
     expect(store.setBoardData).toHaveBeenCalled()
 
     expect(store.boardData.length).toBe(8)
     expect(store.boardData[0].length).toBe(12)
-    expect(store.mines.length).toBe(20)
   })
 
-  it("does not trigger show all mines if first click has a mine", async () => {
-    const store = useStore()
+  it("only applies the bombs after the first click has happened", async () => {
     const wrapper = wrapperFactory()
-    const bombCheckerSpy = vi.spyOn(wrapper.vm, "bombChecker")
+    const allocateBombsSpy = vi.spyOn(wrapper.vm, "allocateBombAxis")
     const showMinesSpy = vi.spyOn(wrapper.vm, "showMines")
-    store.boardData[0][0].hasMine = true
+    const plotBombsSpy = vi.spyOn(wrapper.vm, "plotBombs")
 
-    expect(wrapper.vm.firstPlotClicked).toBe(false)
+    expect(wrapper.vm.isFirstClick).toBe(true)
+    expect(plotBombsSpy).not.toHaveBeenCalled()
 
     wrapper.vm.clickEventHandler(0, 0)
     await flushPromises()
 
-    expect(wrapper.vm.firstPlotClicked).toBe(true)
+    expect(wrapper.vm.isFirstClick).toBe(false)
     expect(showMinesSpy).not.toHaveBeenCalled()
-    expect(bombCheckerSpy).toHaveBeenCalled()
+    expect(allocateBombsSpy).toHaveBeenCalled()
+    expect(plotBombsSpy).toHaveBeenCalled()
   })
 })
