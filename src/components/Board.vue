@@ -235,22 +235,22 @@ export default defineComponent({
   &-container {
     display: flex;
     flex-direction: row;
-    gap: 0.125rem;
+    gap: 0.35rem;
     justify-content: center;
 
     @include sm {
-      gap: 0.5rem;
+      gap: 0.25rem;
     }
   }
 
   &-row {
     display: flex;
     flex-direction: column;
-    gap: 0.125rem;
+    gap: 0.35rem;
     justify-content: center;
 
     @include sm {
-      gap: 0.5rem;
+      gap: 0.25rem;
     }
   }
 }
